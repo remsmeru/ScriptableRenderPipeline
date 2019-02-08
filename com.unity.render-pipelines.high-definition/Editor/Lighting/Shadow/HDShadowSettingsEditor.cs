@@ -40,17 +40,19 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             if (!m_CascadeShadowSplitCount.value.hasMultipleDifferentValues)
             {
                 EditorGUI.indentLevel++;
-                int splitCount = m_CascadeShadowSplitCount.value.intValue;
-                for (int i = 0; i < splitCount - 1; i++)
+                int cascadeCount = m_CascadeShadowSplitCount.value.intValue;
+                for (int i = 0; i < cascadeCount - 1; i++)
                 {
                     PropertyField(m_CascadeShadowSplits[i], EditorGUIUtility.TrTextContent(string.Format("Split {0}", i + 1)));
                 }
 
-                if (LightLoop.s_UseCascadeBorders)
+                ShadowCascadeGUI.DrawCascadeSplitGUI(m_CascadeShadowSplits, m_CascadeShadowBorders, (uint)cascadeCount, blendLastCascade: true);
+
+                //if (LightLoop.s_UseCascadeBorders)
                 {
                     EditorGUILayout.Space();
 
-                    for (int i = 0; i < splitCount; i++)
+                    for (int i = 0; i < cascadeCount; i++)
                     {
                         PropertyField(m_CascadeShadowBorders[i], EditorGUIUtility.TrTextContent(string.Format("Border {0}", i + 1)));
                     }
