@@ -139,6 +139,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             public ComputeShader reflectionBilateralFilterCS;
             public ComputeShader lightClusterBuildCS;
             public ComputeShader lightClusterDebugCS;
+            public ComputeShader countTracedRays;
+            public Shader debugViewRayCountPS;
 #endif
         }
 
@@ -162,7 +164,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             // Pre-baked noise
             public Texture2D[] blueNoise16LTex;
             public Texture2D[] blueNoise16RGBTex;
-            public Texture2D[] coherentRGNoise128;
+            public Texture2D owenScrambledTex;
+            public Texture2D scramblingTex;
 
             // Post-processing
             public Texture2D[] filmGrainTex;
@@ -312,7 +315,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 FXAACS = Load<ComputeShader>(HDRenderPipelinePath + "PostProcessing/Shaders/FXAA.compute"),
                 finalPassPS = Load<Shader>(HDRenderPipelinePath + "PostProcessing/Shaders/FinalPass.shader"),
 
-            
 #if ENABLE_RAYTRACING
                 aoRaytracing = Load<RaytracingShader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/RaytracingAmbientOcclusion.raytrace"),
                 reflectionRaytracing = Load<RaytracingShader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/RaytracingReflections.raytrace"),
@@ -321,7 +323,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 jointBilateralFilterCS = Load<ComputeShader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/JointBilateralFilter.compute"),
                 reflectionBilateralFilterCS = Load<ComputeShader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/RaytracingReflectionFilter.compute"),
                 lightClusterBuildCS = Load<ComputeShader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/RaytracingLightCluster.compute"),
-                lightClusterDebugCS = Load<ComputeShader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/DebugLightCluster.compute")
+                lightClusterDebugCS = Load<ComputeShader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/DebugLightCluster.compute"),
+				countTracedRays = Load<ComputeShader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/CountTracedRays.compute"),
+				debugViewRayCountPS = Load<Shader>(HDRenderPipelinePath + "RenderPipeline/Raytracing/Shaders/DebugViewRayCount.shader")
 #endif
         };
 
@@ -354,7 +358,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
                 blueNoise16LTex = new Texture2D[32],
                 blueNoise16RGBTex = new Texture2D[32],
-                coherentRGNoise128 = new Texture2D[16]
             };
 
             // ShaderGraphs
@@ -369,11 +372,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 textures.blueNoise16RGBTex[i] = Load<Texture2D>(HDRenderPipelinePath + "RenderPipelineResources/Texture/BlueNoise16/RGB/LDR_RGB1_" + i + ".png");
             }
 
-            // Fill-in coherent noise textures
-            for (int i = 0; i < 8; i++)
-            {
-                textures.coherentRGNoise128[i] = Load<Texture2D>(HDRenderPipelinePath + "RenderPipelineResources/Texture/CoherentNoise128/sample_" + i + "_xy.bmp");
-            }
+            // Coherent noise textures
+            textures.owenScrambledTex = Load<Texture2D>(HDRenderPipelinePath + "RenderPipelineResources/Texture/CoherentNoise/OwenScrambledNoise.png");
+            textures.scramblingTex = Load<Texture2D>(HDRenderPipelinePath + "RenderPipelineResources/Texture/CoherentNoise/ScrambleNoise.png");
         }
 #endif
     }
