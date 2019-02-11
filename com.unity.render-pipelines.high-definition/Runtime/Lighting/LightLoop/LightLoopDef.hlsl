@@ -86,6 +86,7 @@ float4 SampleEnv(LightLoopContext lightLoopContext, int index, float3 texCoord, 
 {
     // 31 bit index, 1 bit cache type
     uint cacheType = IsEnvIndexCubemap(index) ? ENVCACHETYPE_CUBEMAP : ENVCACHETYPE_TEXTURE2D;
+    // Index start at 1, because -0 == 0, so we can't known which cache to sample for that index. Thus it is invalid.
     index = abs(index) - 1;
 
     float4 color = float4(0.0, 0.0, 0.0, 1.0);

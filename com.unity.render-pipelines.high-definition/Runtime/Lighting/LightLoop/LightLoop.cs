@@ -1474,6 +1474,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                             break;
 
                         var fetchIndex = m_ReflectionPlanarProbeCache.FetchSlice(cmd, probe.texture);
+                        // Indices start at 1, because -0 == 0, we can know from the bit sign which cache to use
                         envIndex = fetchIndex == -1 ? int.MinValue : -(fetchIndex + 1);
 
                         var renderData = planarProbe.renderData;
@@ -1495,6 +1496,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 case HDAdditionalReflectionData _:
                     {
                         envIndex = m_ReflectionProbeCache.FetchSlice(cmd, probe.texture);
+                        // Indices start at 1, because -0 == 0, we can know from the bit sign which cache to use
                         envIndex = envIndex == -1 ? int.MinValue : (envIndex + 1);
 
                         // Calculate settings to use for the probe
