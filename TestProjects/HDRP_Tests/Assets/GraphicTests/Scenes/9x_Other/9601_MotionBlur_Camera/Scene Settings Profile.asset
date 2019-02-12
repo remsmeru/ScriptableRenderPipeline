@@ -18,6 +18,9 @@ MonoBehaviour:
   skyType:
     m_OverrideState: 1
     m_Value: 1
+  skyAmbientMode:
+    m_OverrideState: 0
+    m_Value: 0
   fogType:
     m_OverrideState: 1
     m_Value: 2
@@ -243,7 +246,7 @@ MonoBehaviour:
   - {fileID: 1906998338381081184}
   - {fileID: -1977287653889231898}
   - {fileID: -3990501575690934820}
-  - {fileID: 4496069717186440673}
+  - {fileID: 6243030081904036912}
 --- !u!114 &1906998338381081184
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -371,7 +374,7 @@ MonoBehaviour:
   enableSunDisk:
     m_OverrideState: 1
     m_Value: 1
---- !u!114 &4496069717186440673
+--- !u!114 &6243030081904036912
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -387,28 +390,25 @@ MonoBehaviour:
   active: 1
   m_AdvancedMode: 0
   sampleCount:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 8
     min: 2
-  enabled:
-    m_OverrideState: 1
-    m_Value: 1
   intensity:
-    m_OverrideState: 1
-    m_Value: 2.5
+    m_OverrideState: 0
+    m_Value: 0
     min: 0
   maxVelocity:
-    m_OverrideState: 1
-    m_Value: 256
+    m_OverrideState: 0
+    m_Value: 250
     min: 0
-    max: 256
-  minVelInPixels:
-    m_OverrideState: 1
+    max: 1500
+  minVel:
+    m_OverrideState: 0
     m_Value: 2
     min: 0
     max: 64
   cameraRotationVelocityClamp:
-    m_OverrideState: 1
-    m_Value: 0.1
+    m_OverrideState: 0
+    m_Value: 0.03
     min: 0
     max: 0.2
