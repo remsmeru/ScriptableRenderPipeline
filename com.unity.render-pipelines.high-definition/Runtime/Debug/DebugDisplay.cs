@@ -31,7 +31,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         NanTracker,
         MaxRenderingFullScreenDebug,
 
-        //Material
+        //Materail
         MinMaterialFullScreenDebug,
         ValidateDiffuseColor,
         ValidateSpecularColor,

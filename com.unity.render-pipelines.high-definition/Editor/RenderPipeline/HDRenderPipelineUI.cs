@@ -318,22 +318,14 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 }
                 if (!serialized.renderPipelineSettings.dynamicResolutionSettings.forcePercentage.boolValue)
                 {
-                    SerializedProperty minPercentage = serialized.renderPipelineSettings.dynamicResolutionSettings.minPercentage;
-                    SerializedProperty maxPercentage = serialized.renderPipelineSettings.dynamicResolutionSettings.maxPercentage;
-
-                    maxPercentage.floatValue = Mathf.Clamp(maxPercentage.floatValue, 0.0f, 100.0f);
-                    minPercentage.floatValue = Mathf.Clamp(minPercentage.floatValue, 0.0f, maxPercentage.floatValue);
-
-                    EditorGUILayout.DelayedFloatField(minPercentage, k_MinPercentage);
-                    EditorGUILayout.DelayedFloatField(maxPercentage, k_MaxPercentage);
+                    EditorGUILayout.DelayedFloatField(serialized.renderPipelineSettings.dynamicResolutionSettings.minPercentage, k_MinPercentage);
+                    EditorGUILayout.DelayedFloatField(serialized.renderPipelineSettings.dynamicResolutionSettings.maxPercentage, k_MaxPercentage);
                 }
 
                 EditorGUILayout.PropertyField(serialized.renderPipelineSettings.dynamicResolutionSettings.forcePercentage, k_ForceScreenPercentage);
                 if (serialized.renderPipelineSettings.dynamicResolutionSettings.forcePercentage.boolValue)
                 {
-                    SerializedProperty forcePercentage = serialized.renderPipelineSettings.dynamicResolutionSettings.forcedPercentage;
-                    forcePercentage.floatValue = Mathf.Clamp(forcePercentage.floatValue, 0.0f, 100.0f);
-                    EditorGUILayout.DelayedFloatField(forcePercentage, k_ForcedScreenPercentage);
+                    EditorGUILayout.DelayedFloatField(serialized.renderPipelineSettings.dynamicResolutionSettings.forcedPercentage, k_ForcedScreenPercentage);
                 }
             }
             --EditorGUI.indentLevel;
