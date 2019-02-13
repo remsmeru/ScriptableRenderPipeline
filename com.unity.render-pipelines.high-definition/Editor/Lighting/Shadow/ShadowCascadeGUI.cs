@@ -191,7 +191,7 @@ namespace UnityEditor
 
                 // init rect for Swatches
                 Rect cascadeHandleRect = default;
-                if (i < endPartitionBordersPercent.Length - 1)
+                if (i < normalizedCascadePartitions.Length)
                 {
                     cascadeHandleRect = separationRect;
                     cascadeHandleRect.x += separationRect.width - 6f;
@@ -208,7 +208,7 @@ namespace UnityEditor
                 if (eventType == EventType.Repaint) //Can only draw the snatch in repaint event
                 {
                     // Add handle to change end of cascade
-                    if (i < endPartitionBordersPercent.Length - 1)
+                    if (i < normalizedCascadePartitions.Length)
                     {
                         GUI.backgroundColor = enabledCascadePartitionHandles[i] ? kCascadeColors[colorIndex + 1] : kDisabledColor;
                         s_DownSwatch.Draw(cascadeHandleRect, false, false, s_BlendHandleSelected == i, false);
