@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [6.1.0-preview] - 2019-XX-XX
 
 ### Added
+- Added support for post-processing anti-aliasing in the Scene View (FXAA and TAA). These can be set in Preferences.
 - Added cascade visualizer, supporting disabled handles when not overriding.
 
 ### Fixed
+- Fixed a few UI bugs with the color grading curves.
+- Fixed "Post Processing" in the scene view not toggling post-processing effects.
 
 ### Changed
 - Removed unsupported Clear Depth checkbox in Camera inspector
@@ -60,6 +63,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added support for Quarter Res Raytraced Reflections (not enabled)
 - Added fade factor for decal projectors.
 - Added stereo instancing macros to most shaders used in VR
+- Added emissive property for decal material (non-shader graph)
 - Added multi edition support for HDRenderPipelineAsset
 
 ### Fixed
@@ -132,6 +136,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed pre-exposure incorrectly apply to preview
 - Fixed issue with duplicate 3D texture in 3D texture altas of volumetric
 - Fixed Camera rendering order (base on the depth parameter)
+- Fixed bake only object with flag `ReflectionProbeStaticFlag` when baking a `ReflectionProbe`
 
 ### Changed
 - ColorPyramid compute shader passes is swapped to pixel shader passes on platforms where the later is faster (Nintendo Switch).
