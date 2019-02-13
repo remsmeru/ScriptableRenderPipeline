@@ -31,6 +31,7 @@ namespace UnityEditor
             new Color(0.6f, 0.6f, 0.5f, 1.0f),
             new Color(0.6f, 0.5f, 0.5f, 1.0f),
         };
+        private static readonly Color kDisabledColor = new Color(0.5f, 0.5f, 0.5f, 0.4f); //works with both personal and pro skin
 
         private static readonly Texture2D[] kBorderBlends =
         {
@@ -194,13 +195,13 @@ namespace UnityEditor
                 {
                     cascadeHandleRect = separationRect;
                     cascadeHandleRect.x += separationRect.width - 6f;
-                    cascadeHandleRect.width = 10;
+                    cascadeHandleRect.width = enabledCascadePartitionHandles[i] ? 10 : 0;
                     cascadeHandleRect.y -= 14;
                     cascadeHandleRect.height = 15;
                 }
                 Rect blendHandleRect = separationRect;
                 blendHandleRect.x -= 5f;
-                blendHandleRect.width = 10;
+                blendHandleRect.width = enabledEndPartitionBorderHandles[i] ? 10 : 0;
                 blendHandleRect.y += 22;
                 blendHandleRect.height = 15;
 
@@ -209,11 +210,11 @@ namespace UnityEditor
                     // Add handle to change end of cascade
                     if (i < endPartitionBordersPercent.Length - 1)
                     {
-                        GUI.backgroundColor = kCascadeColors[colorIndex + 1];
+                        GUI.backgroundColor = enabledCascadePartitionHandles[i] ? kCascadeColors[colorIndex + 1] : kDisabledColor;
                         s_DownSwatch.Draw(cascadeHandleRect, false, false, s_BlendHandleSelected == i, false);
                     }
 
-                    GUI.backgroundColor = kCascadeColors[colorIndex];
+                    GUI.backgroundColor = enabledEndPartitionBorderHandles[i] ? kCascadeColors[colorIndex] : kDisabledColor;
                     s_UpSwatch.Draw(blendHandleRect, false, false, s_BlendHandleSelected == i + 100, false);
                 }
 
@@ -342,6 +343,12 @@ namespace UnityEditor
 
             float[] cascadePartitionSizes = new float[splitCount]; //does not handle remaining (last partition)
             float[] cascadeEndBlendPercent = new float[blendLastCascade ? cascadeCount : splitCount];
+            bool[] enabledPartitionHandles = new bool[splitCount];
+            for (int i = 0; i < splitCount; ++i)
+                enabledPartitionHandles[i] = splits[i].overrideState.boolValue;
+            bool[] enabledEndPartitionHandles = new bool[cascadeEndBlendPercent.Length];
+            for (int i = 0; i < cascadeEndBlendPercent.Length; ++i)
+                enabledEndPartitionHandles[i] = borders[i].overrideState.boolValue;
 
             if (splitCount > 0)
             {
@@ -359,7 +366,7 @@ namespace UnityEditor
             if (cascadePartitionSizes != null)
             {
                 EditorGUI.BeginChangeCheck();
-                HandleCascadeSliderGUI(ref cascadePartitionSizes, ref cascadeEndBlendPercent);
+                HandleCascadeSliderGUI(ref cascadePartitionSizes, ref cascadeEndBlendPercent, enabledPartitionHandles, enabledEndPartitionHandles);
                 if (EditorGUI.EndChangeCheck())
                 {
                     if (splitCount > 0)
