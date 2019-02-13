@@ -81,9 +81,11 @@ namespace UnityEditor
          *  @param  normalizedCascadePartition      The array of partition sizes in the range 0.0f - 1.0f; expects ONE entry if cascades = 2, and THREE if cascades=4
          *                                          The last entry will be automatically determined by summing up the array, and doing 1.0f - sum
          */
-        static void HandleCascadeSliderGUI(ref float[] normalizedCascadePartitions, ref float[] endPartitionBordersPercent, bool[] enabledCascadePartitionHandles, bool[] enabledEndPartitionBorderHandles)
+        static void HandleCascadeSliderGUI(ref float[] normalizedCascadePartitions, ref float[] endPartitionBordersPercent, bool[] enabledCascadePartitionHandles, bool[] enabledEndPartitionBorderHandles, bool drawEndPartitionHandles, bool useMetric, float baseMetric)
         {
-            GUILayout.Label("Cascade splits");
+            EditorGUILayout.BeginVertical();
+            GUILayout.Space(10);
+            EditorGUILayout.BeginHorizontal();
 
             // get the inspector width since we need it while drawing the partition rects.
             // Only way currently is to reserve the block in the layout using GetRect(), and then immediately drawing the empty box
@@ -159,7 +161,10 @@ namespace UnityEditor
 
                 // full cascade box text
                 GUI.color = Color.white;
-                var cascadeText = String.Format(System.Globalization.CultureInfo.InvariantCulture.NumberFormat, "{0}\n{1:F1}%", i, fullCascadeValue);
+                float textValue = fullCascadeValue;
+                if (useMetric)
+                    textValue *= baseMetric / 100;
+                var cascadeText = String.Format(System.Globalization.CultureInfo.InvariantCulture.NumberFormat, "{0}\n{1:F1}{2}", i, textValue, useMetric ? 'm' : '%');
                 GUI.Label(fullCascadeText, TempGUIContent(cascadeText, cascadeText), s_TextCenteredStyle);
 
                 if (i >= endPartitionBordersPercent.Length)
@@ -177,15 +182,18 @@ namespace UnityEditor
                 }
 
                 // blend cascade box text
+                textValue = blendCascadeValue;
+                if (useMetric)
+                    textValue *= baseMetric / 100;
                 if (i == normalizedCascadePartitions.Length)
                 {
-                    cascadeText = String.Format(System.Globalization.CultureInfo.InvariantCulture.NumberFormat, "{0}\u2192{1}\n{2:F1}%", i, blendCascadeText.width < 57 ? "F." : "Fallback", blendCascadeValue);
-                    string cascadeToolTip = String.Format(System.Globalization.CultureInfo.InvariantCulture.NumberFormat, "{0}\u2192{1}\n{2:F1}%", i, "Fallback", blendCascadeValue);
+                    cascadeText = String.Format(System.Globalization.CultureInfo.InvariantCulture.NumberFormat, "{0}\u2192{1}\n{2:F1}{3}", i, blendCascadeText.width < 57 ? "F." : "Fallback", textValue, useMetric ? 'm' : '%');
+                    string cascadeToolTip = String.Format(System.Globalization.CultureInfo.InvariantCulture.NumberFormat, "{0}\u2192{1}\n{2:F1}{3}", i, "Fallback", textValue, useMetric ? 'm' : '%');
                     GUI.Label(blendCascadeText, TempGUIContent(cascadeText, cascadeToolTip), s_TextCenteredStyle);
                 }
                 else
                 {
-                    cascadeText = String.Format(System.Globalization.CultureInfo.InvariantCulture.NumberFormat, "{0}\u2192{1}\n{2:F1}%", i, i + 1, blendCascadeValue);
+                    cascadeText = String.Format(System.Globalization.CultureInfo.InvariantCulture.NumberFormat, "{0}\u2192{1}\n{2:F1}{3}", i, i + 1, textValue, useMetric ? 'm' : '%');
                     GUI.Label(blendCascadeText, TempGUIContent(cascadeText, cascadeText), s_TextCenteredStyle);
                 }
 
@@ -199,11 +207,15 @@ namespace UnityEditor
                     cascadeHandleRect.y -= 14;
                     cascadeHandleRect.height = 15;
                 }
-                Rect blendHandleRect = separationRect;
-                blendHandleRect.x -= 5f;
-                blendHandleRect.width = enabledEndPartitionBorderHandles[i] ? 10 : 0;
-                blendHandleRect.y += 22;
-                blendHandleRect.height = 15;
+                Rect blendHandleRect = default;
+                if (drawEndPartitionHandles)
+                {
+                    blendHandleRect = separationRect;
+                    blendHandleRect.x -= 5f;
+                    blendHandleRect.width = enabledEndPartitionBorderHandles[i] ? 10 : 0;
+                    blendHandleRect.y += 22;
+                    blendHandleRect.height = 15;
+                }
 
                 if (eventType == EventType.Repaint) //Can only draw the snatch in repaint event
                 {
@@ -214,8 +226,11 @@ namespace UnityEditor
                         s_DownSwatch.Draw(cascadeHandleRect, false, false, s_BlendHandleSelected == i, false);
                     }
 
-                    GUI.backgroundColor = enabledEndPartitionBorderHandles[i] ? kCascadeColors[colorIndex] : kDisabledColor;
-                    s_UpSwatch.Draw(blendHandleRect, false, false, s_BlendHandleSelected == i + 100, false);
+                    if (drawEndPartitionHandles)
+                    {
+                        GUI.backgroundColor = enabledEndPartitionBorderHandles[i] ? kCascadeColors[colorIndex] : kDisabledColor;
+                        s_UpSwatch.Draw(blendHandleRect, false, false, s_BlendHandleSelected == i + 100, false);
+                    }
                 }
 
                 if (cascadeHandleRect.Contains(currentEvent.mousePosition))
@@ -313,6 +328,10 @@ namespace UnityEditor
                     currentEvent.Use();
                     break;
             }
+
+            EditorGUILayout.EndHorizontal();
+            GUILayout.Space(6);
+            EditorGUILayout.EndVertical();
         }
 
         public static void FillWithGradient(Texture2D tex, Color left, Color right)
@@ -328,13 +347,10 @@ namespace UnityEditor
             tex.Apply();
         }
 
-        public static void DrawCascadeSplitGUI(SerializedDataParameter[] splits, SerializedDataParameter[] borders, uint cascadeCount, bool blendLastCascade = false)
+        public static void DrawCascadeSplitGUI(SerializedDataParameter[] splits, SerializedDataParameter[] borders, uint cascadeCount, bool blendLastCascade = false, bool useMetric = false, float baseMetric = 10f)
         {
             if (cascadeCount <= 0)
                 throw new ArgumentException("Cascade amount must be strictly positive");
-
-            if (cascadeCount > borders.Length)
-                throw new ArgumentException("Cannot use more borders than provided.");
 
             uint splitCount = cascadeCount - 1;
             
@@ -348,25 +364,25 @@ namespace UnityEditor
                 enabledPartitionHandles[i] = splits[i].overrideState.boolValue;
             bool[] enabledEndPartitionHandles = new bool[cascadeEndBlendPercent.Length];
             for (int i = 0; i < cascadeEndBlendPercent.Length; ++i)
-                enabledEndPartitionHandles[i] = borders[i].overrideState.boolValue;
+                enabledEndPartitionHandles[i] = borders == null || borders.Length <= i ? false : borders[i].overrideState.boolValue;
 
             if (splitCount > 0)
             {
                 cascadePartitionSizes[0] = Mathf.Max(0f, splits[0].value.floatValue);
-                cascadeEndBlendPercent[0] = Mathf.Clamp01(borders[0].value.floatValue);
+                cascadeEndBlendPercent[0] = borders == null || borders.Length <= 0 ? 0f : Mathf.Clamp01(borders[0].value.floatValue);
             }
             for (int index = 1; index < splitCount; ++index)
             {
                 cascadePartitionSizes[index] = Mathf.Max(0f, splits[index].value.floatValue - splits[index - 1].value.floatValue);
-                cascadeEndBlendPercent[index] = Mathf.Clamp01(borders[index].value.floatValue);
+                cascadeEndBlendPercent[index] = borders == null || borders.Length <= index ? 0f : Mathf.Clamp01(borders[index].value.floatValue);
             }
-            if (blendLastCascade)
+            if (blendLastCascade && borders != null && borders.Length > splitCount)
                 cascadeEndBlendPercent[splitCount] = Mathf.Clamp01(borders[splitCount].value.floatValue);
 
             if (cascadePartitionSizes != null)
             {
                 EditorGUI.BeginChangeCheck();
-                HandleCascadeSliderGUI(ref cascadePartitionSizes, ref cascadeEndBlendPercent, enabledPartitionHandles, enabledEndPartitionHandles);
+                HandleCascadeSliderGUI(ref cascadePartitionSizes, ref cascadeEndBlendPercent, enabledPartitionHandles, enabledEndPartitionHandles, drawEndPartitionHandles: borders != null, useMetric, baseMetric);
                 if (EditorGUI.EndChangeCheck())
                 {
                     if (splitCount > 0)
