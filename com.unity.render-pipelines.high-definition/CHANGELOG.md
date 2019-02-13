@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [6.1.0-preview] - 2019-XX-XX
 
 ### Added
+- Added cascade visualizer, supporting disabled handles when not overriding.
 
 ### Fixed
 
 ### Changed
 - Removed unsupported Clear Depth checkbox in Camera inspector
+- Updated the toggle for advanced mode in inspectors.
 
 ## [6.0.0-preview] - 2019-02-23
 
